@@ -2,13 +2,9 @@
 
 CodeGrader is an automated online coding platform designed for college-level programming lab assignments. It simplifies grading by automatically executing student submissions, checking correctness against test cases, and providing instant feedback.
 
-🔗 [Live Demo](http://localhost:3000)
-
-📘 Student Classroom Join Code: `8e343e`
-
 ## Features
 
-### 🎯 **Core Features**
+### Core Features
 
 - **Automated Code Execution & Grading** - Runs submissions and checks correctness against test cases
 - **Multiple Language Support** - Supports Python, Java, C++, JavaScript, TypeScript, and more
@@ -18,7 +14,7 @@ CodeGrader is an automated online coding platform designed for college-level pro
 - **Instant Feedback** - Provides real-time feedback to students with detailed execution results
 - **Role-Based Access Control** - Separate interfaces for Faculty and Students
 
-### 🏫 **Faculty Features**
+### Faculty Features
 
 - **Classroom Management** - Create and manage virtual classrooms with unique codes
 - **Assignment Creation** - Build multi-question assignments with detailed problem statements
@@ -27,7 +23,7 @@ CodeGrader is an automated online coding platform designed for college-level pro
 - **Submission Review** - Detailed view of student submissions with test case results
 - **Performance Analytics** - Track completion rates, scores, and submission patterns
 
-### 👨‍🎓 **Student Features**
+### Student Features
 
 - **Interactive Code Editor** - Monaco editor with syntax highlighting and auto-completion
 - **Custom Test Case Testing** - Run code against custom inputs before submission
@@ -35,7 +31,7 @@ CodeGrader is an automated online coding platform designed for college-level pro
 - **Real-time Status Updates** - Live updates on code execution and grading status
 - **Restriction Notifications** - Clear feedback when attempting restricted actions
 
-### 🔒 **Security & Proctoring**
+### Security & Proctoring
 
 - **Copy-Paste Prevention** - Disable copy/paste functionality during assignments
 - **Fullscreen Enforcement** - Require fullscreen mode to prevent cheating
@@ -44,65 +40,76 @@ CodeGrader is an automated online coding platform designed for college-level pro
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Frontend:** Next.js 15, React 19, TypeScript, Tailwind CSS
-- **Backend:** Next.js API Routes, Prisma ORM 6
+- **Backend:** Next.js API Routes, Prisma ORM
 - **Database:** PostgreSQL
-- **Execution Engine:** Judge0 API + Custom Execution Server
-- **Authentication:** NextAuth.js v5 with OAuth providers
-- **UI Components:** Shadcn/ui, Radix UI
-- **Animations:** Framer Motion
-- **Code Editor:** Monaco Editor with syntax highlighting
-- **AI:** Groq SDK for AI-powered test-case generation and code evaluation
-- **Deployment:** Vercel, Docker support
+- **Execution Engine:** Judge0 API
+- **Authentication:** NextAuth v5 with Google OAuth
+- **LLM:** Groq (Llama 3.3 70B) for test-case generation and code evaluation
+- **UI Components:** Shadcn/ui
+- **Code Editor:** Monaco Editor
+- **Deployment:** Docker Compose
 
 ---
 
-## Quick Start
+## Getting Started
 
 ### Prerequisites
+
 - Node.js 20+
-- PostgreSQL 15+
+- PostgreSQL
 - Docker (optional, for containerized setup)
+- Judge0 API key (from RapidAPI)
+- Groq API key
+- Google OAuth credentials
 
-### Local Setup
-```bash
-# 1. Install dependencies
+### Installation
+
+```sh
+git clone https://github.com/Tom-Teixeira/code-grader.git
+cd code-grader
 npm install
+```
 
-# 2. Configure environment
+Set up environment variables (copy `.env.example` to `.env` and fill in values):
+
+```sh
 cp .env.example .env
-# Edit .env with your DATABASE_URL, AUTH_SECRET, OAuth credentials, Judge0 API key
+```
 
-# 3. Run database migrations
+Run migrations:
+
+```sh
 npx prisma migrate dev
+```
 
-# 4. Start dev server
+Start dev server:
+
+```sh
 npm run dev
 ```
 
-### Docker Compose
-```bash
+Or with Docker Compose:
+
+```sh
 docker-compose up --build
-# App runs at http://localhost:3000
 ```
 
 ---
 
 ## Architecture
 
-CodeGrader follows a modern full-stack architecture:
+The platform supports two roles:
 
-- **Next.js App Router** with server components and API routes
-- **Prisma ORM** with typed database access and migration system
-- **Judge0 sandbox** for secure code execution across 10+ programming languages
-- **NextAuth v5** with Google OAuth and role-based access control (Faculty/Student)
-- **Groq LLM integration** for AI-powered test-case generation and code feedback
-- **Structured scoring pipeline**: test-case execution (60%) + LLM metric evaluation (40%)
+- **Faculty**: create classrooms, author assignments with questions and test cases, monitor student progress in real time, and review analytics.
+- **Students**: join classrooms via code, solve problems in an integrated Monaco editor, run custom test cases, and submit for automated grading.
+
+Submissions are executed asynchronously via Judge0 CE. Results are delivered through webhook callbacks and reflected in a per-submission state machine (Pending → Running → Passed / Failed / Timeout / Error). LLM-generated test cases and multi-metric code-quality scores are produced by Groq with exponential-backoff retry.
 
 ---
 
-## Contact
+## License
 
-For any inquiries, please reach out to 21735749a@gmail.com.
+Private project. For inquiries, contact 21735749a@gmail.com.
