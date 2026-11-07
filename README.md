@@ -1,115 +1,41 @@
-# CodeGrader - Online Code Evaluation & Grading System
+# CodeGrader
 
-CodeGrader is an automated online coding platform designed for college-level programming lab assignments. It simplifies grading by automatically executing student submissions, checking correctness against test cases, and providing instant feedback.
+A web app for running and grading programming lab assignments. Faculty create classrooms and post multi-question assignments; students write code in the browser and get results back automatically.
 
-## Features
+## What it does
 
-### Core Features
+Student submissions are sent to Judge0, which runs the code in a sandbox and returns output. Each question has a set of test cases (some hidden) that determine whether the submission passes. A Groq-hosted Llama 3.3 model can also generate test cases from a problem description and give a rough code-quality score across a few metrics.
 
-- **Automated Code Execution & Grading** - Runs submissions and checks correctness against test cases
-- **Multiple Language Support** - Supports Python, Java, C++, JavaScript, TypeScript, and more
-- **Secure Execution Environment** - Runs code in a sandboxed, isolated environment using Judge0
-- **Custom Test Cases** - Teachers can define their own test cases with hidden/public visibility
-- **AI-Powered Test Case Generation** - Automatically generate comprehensive test cases using AI based on question descriptions
-- **Instant Feedback** - Provides real-time feedback to students with detailed execution results
-- **Role-Based Access Control** - Separate interfaces for Faculty and Students
+Faculty can track who has submitted, view per-question results, and see basic completion stats. The editor is Monaco with language support for Python, Java, C++, JavaScript, TypeScript, Go, Rust, and a few others.
 
-### Faculty Features
+## Stack
 
-- **Classroom Management** - Create and manage virtual classrooms with unique codes
-- **Assignment Creation** - Build multi-question assignments with detailed problem statements
-- **Live Student Monitoring** - Real-time tracking of student progress and activity
-- **Analytics Dashboard** - Comprehensive student progress tracking with export capabilities
-- **Submission Review** - Detailed view of student submissions with test case results
-- **Performance Analytics** - Track completion rates, scores, and submission patterns
+- Next.js 15 (App Router) with React 19 and TypeScript
+- Prisma 6 against PostgreSQL
+- NextAuth v5 with Google OAuth, JWT sessions, faculty/student roles
+- Judge0 CE for code execution
+- Groq LLM for test-case generation and scoring
+- Docker Compose for local dev (Postgres + app)
 
-### Student Features
+## Running it
 
-- **Interactive Code Editor** - Monaco editor with syntax highlighting and auto-completion
-- **Custom Test Case Testing** - Run code against custom inputs before submission
-- **Submission History** - View all previous submissions with detailed feedback
-- **Real-time Status Updates** - Live updates on code execution and grading status
-- **Restriction Notifications** - Clear feedback when attempting restricted actions
-
-### Security & Proctoring
-
-- **Copy-Paste Prevention** - Disable copy/paste functionality during assignments
-- **Fullscreen Enforcement** - Require fullscreen mode to prevent cheating
-- **Secure Code Execution** - Sandboxed environment for safe code testing
-- **Session Management** - Secure authentication and session handling
-
----
-
-## Tech Stack
-
-- **Frontend:** Next.js 15, React 19, TypeScript, Tailwind CSS
-- **Backend:** Next.js API Routes, Prisma ORM
-- **Database:** PostgreSQL
-- **Execution Engine:** Judge0 API
-- **Authentication:** NextAuth v5 with Google OAuth
-- **LLM:** Groq (Llama 3.3 70B) for test-case generation and code evaluation
-- **UI Components:** Shadcn/ui
-- **Code Editor:** Monaco Editor
-- **Deployment:** Docker Compose
-
----
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 20+
-- PostgreSQL
-- Docker (optional, for containerized setup)
-- Judge0 API key (from RapidAPI)
-- Groq API key
-- Google OAuth credentials
-
-### Installation
-
-```sh
+```
 git clone https://github.com/Tom-Teixeira/code-grader.git
 cd code-grader
 npm install
-```
-
-Set up environment variables (copy `.env.example` to `.env` and fill in values):
-
-```sh
-cp .env.example .env
-```
-
-Run migrations:
-
-```sh
+cp .env.example .env   # fill in Judge0, Groq, and Google OAuth keys
 npx prisma migrate dev
-```
-
-Start dev server:
-
-```sh
 npm run dev
 ```
 
-Or with Docker Compose:
+Alternatively, `docker-compose up --build` starts Postgres and the app together. The app runs on port 3000.
 
-```sh
-docker-compose up --build
-```
+## Schema notes
 
----
+The Prisma schema has 13 models covering users, classrooms, assignments, questions, test cases, submissions, and LLM evaluation results. Cascade deletes handle cleanup when a classroom or assignment is removed, and the submission flow uses a status enum (pending, running, passed, failed, timeout, error) rather than free-form strings.
 
-## Architecture
+Judge0 jobs are capped at 2 seconds of CPU time and 128 MB of memory. LLM calls retry up to three times with exponential backoff and validate the response against a JSON schema before touching the database.
 
-The platform supports two roles:
+## Contact
 
-- **Faculty**: create classrooms, author assignments with questions and test cases, monitor student progress in real time, and review analytics.
-- **Students**: join classrooms via code, solve problems in an integrated Monaco editor, run custom test cases, and submit for automated grading.
-
-Submissions are executed asynchronously via Judge0 CE. Results are delivered through webhook callbacks and reflected in a per-submission state machine (Pending → Running → Passed / Failed / Timeout / Error). LLM-generated test cases and multi-metric code-quality scores are produced by Groq with exponential-backoff retry.
-
----
-
-## License
-
-Private project. For inquiries, contact 21735749a@gmail.com.
+21735749a@gmail.com
